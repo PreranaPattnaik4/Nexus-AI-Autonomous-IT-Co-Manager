@@ -180,7 +180,7 @@ export function ChatDialog() {
       </DialogTrigger>
       <DialogContent 
         className={cn(
-            "sm:max-w-2xl h-full flex flex-col fixed right-0 top-0 translate-x-0 translate-y-0 rounded-l-none border-l bg-background/80 backdrop-blur-lg shadow-lg",
+            "sm:max-w-lg h-full flex flex-col fixed right-0 top-0 translate-x-0 translate-y-0 rounded-l-none border-l bg-background/80 backdrop-blur-lg shadow-lg pt-10",
             "data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right"
         )}
       >
