@@ -68,6 +68,7 @@ To make the codebase easy to navigate for judges, the key files are organized in
 *   `src/app/`: Contains all pages and layouts for the Next.js application, following the App Router paradigm. Each folder (e.g., `/dashboard`, `/tasks`) corresponds to a URL route.
 *   `src/components/`: The heart of the UI, containing all reusable React components.
     *   `src/components/dashboard/`: Components specifically for the main dashboard, like `GoalForm`, `TasksList`, and `AlertsCard`.
+    *   `src/components/app-sidebar.tsx`: The main application sidebar, which now contains all navigation logic.
     *   `src/components/ui/`: Reusable, generic UI elements from ShadCN, such as `Button`, `Card`, and `Input`.
 *   `src/firebase/`: Manages all client-side Firebase interactions.
     *   `client-provider.tsx`: Initializes Firebase on the client.
