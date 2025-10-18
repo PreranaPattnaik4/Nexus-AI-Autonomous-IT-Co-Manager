@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { FileText, CheckCircle2, XCircle, Loader, ChevronDown, ChevronUp, Bot, Recycle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { RcaReportDialog } from './rca-report-dialog';
-import { Task } from '@/lib/firestore-types';
+import type { Task } from '@/lib/firestore-types';
 import { useToast } from '@/hooks/use-toast';
 
 const statusIcons = {
@@ -59,6 +59,13 @@ function RetryButton({ taskId, taskGoal }: { taskId: string, taskGoal: string })
 
 export function TaskItem({ task }: { task: Task }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [timeAgo, setTimeAgo] = useState('');
+
+  useEffect(() => {
+    // This ensures the time is only calculated on the client, after hydration
+    setTimeAgo(formatDistanceToNow(new Date(task.createdAt), { addSuffix: true }));
+  }, [task.createdAt]);
+
   const statusIcon = statusIcons[task.status];
   const isFinished = task.status === 'completed' || task.status === 'failed';
 
@@ -90,7 +97,7 @@ export function TaskItem({ task }: { task: Task }) {
             <span className="text-xs font-medium text-muted-foreground w-10 text-right">{task.progress}%</span>
         </div>
          <p className="text-xs text-muted-foreground">
-            Created {formatDistanceToNow(new Date(task.createdAt), { addSuffix: true })}
+            {timeAgo ? `Created ${timeAgo}` : 'Created...'}
         </p>
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center gap-2">
