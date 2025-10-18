@@ -35,7 +35,7 @@ const navItems = [
   { href: '/dashboard#alerts', label: 'Active Alerts', icon: AlertTriangle },
   { href: '/history', label: 'History', icon: History },
   { href: '/integrations', label: 'Integrations', icon: Zap },
-  { href: '/profile', label: 'Profile & Settings', icon: User },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 function NavItems() {
@@ -45,40 +45,30 @@ function NavItems() {
   const tab = searchParams.get('tab');
 
   const getIsActive = (href: string) => {
-    // Exact match for base path
-    if (href === pathname && !status && !tab) {
-      return true;
-    }
-
-    // Handle query params
-    if (href.includes('?')) {
-      const [base, query] = href.split('?');
-      const params = new URLSearchParams(query);
-      const hasMatchingParams = Array.from(params.entries()).every(([key, value]) => {
-          if (pathname === '/history' && key === 'status') {
-              return searchParams.get('tab') === value;
-          }
-          return searchParams.get(key) === value;
-      });
-
-      return pathname === base && hasMatchingParams;
-    }
+    const currentPath = `${pathname}${status ? `?status=${status}` : ''}${tab ? `?tab=${tab}` : ''}`;
     
-    // Handle special cases for parent routes
-    if (href === '/tasks' && pathname.startsWith('/tasks') && status) {
-        return false; // Don't activate "All Tasks" if a filter is active
+    // Exact match
+    if (href === currentPath) return true;
+
+    // Handle parent routes being active
+    if (pathname.startsWith(href) && href !== '/') {
+        if (href === '/tasks' && status) return false;
+        if (href === '/history' && tab) return false;
+        if (pathname !== href) return false;
     }
 
-    if (href === '/history' && pathname === '/history' && tab) {
-        return false;
-    }
+    // Special cases for tabs pointing to same pages
+    if (href === '/tasks?status=completed' && pathname === '/history' && tab === 'completed') return true;
+    if (href === '/tasks?status=failed' && pathname === '/history' && tab === 'failed') return true;
+    if (href === '/history?tab=completed' && pathname === '/tasks' && status === 'completed') return true;
+    if (href === '/history?tab=failed' && pathname === '/tasks' && status === 'failed') return true;
     
-    // Handle profile/settings consolidation
+    // Handle consolidated profile/settings
     if ((href === '/profile' || href === '/settings') && (pathname === '/profile' || pathname === '/settings')) {
         return true;
     }
 
-    return false;
+    return href === pathname;
   };
 
 
@@ -108,11 +98,11 @@ function NavItems() {
 
 function NavItemsSkeleton() {
     return (
-        <>
+        <div className='space-y-1'>
             {navItems.map((item) => (
                 <Skeleton key={item.href} className="h-10 w-full" />
             ))}
-        </>
+        </div>
     )
 }
 

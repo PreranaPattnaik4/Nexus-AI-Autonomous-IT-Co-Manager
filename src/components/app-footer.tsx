@@ -4,6 +4,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Logo } from './icons';
 import AboutPage from '@/app/about/page';
@@ -34,7 +35,9 @@ export function AppFooter() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Dialog>
-                   <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary"><LifeBuoy className="w-4 h-4 mr-2"/>FAQ</Button>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary"><LifeBuoy className="w-4 h-4 mr-2"/>FAQ</Button>
+                  </DialogTrigger>
                   <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
                     <FaqPage />
                   </DialogContent>
@@ -42,7 +45,9 @@ export function AppFooter() {
               </li>
               <li>
                 <Dialog>
-                   <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">Contact</Button>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">Contact</Button>
+                  </DialogTrigger>
                   <DialogContent>
                     <ContactPage />
                   </DialogContent>
@@ -50,7 +55,9 @@ export function AppFooter() {
               </li>
               <li>
                 <Dialog>
-                   <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">About NexusAI</Button>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">About NexusAI</Button>
+                  </DialogTrigger>
                   <DialogContent className="sm:max-w-2xl">
                     <AboutPage />
                   </DialogContent>

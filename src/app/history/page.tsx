@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { History, CheckCheck, XCircle, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TasksList } from '@/components/dashboard/tasks-list';
-import { Task } from '@/lib/firestore-types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subDays } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
@@ -20,18 +19,6 @@ function ReportsList() {
 
     const historicalTasks = useMemo(() => 
         allStaticTasks
-            .concat([
-                // Adding more diverse static tasks for a richer 30-day log
-                { id: 'task-7', goal: 'Migrate legacy database to new cloud instance', status: 'completed', progress: 100, createdAt: subDays(new Date(), 2), steps: [] },
-                { id: 'task-8', goal: 'Perform quarterly security audit', status: 'completed', progress: 100, createdAt: subDays(new Date(), 4), steps: [] },
-                { id: 'task-9', goal: 'Update firewall rules for new IP range', status: 'failed', progress: 75, createdAt: subDays(new Date(), 7), steps: [] },
-                { id: 'task-10', goal: 'Provision a new staging environment for Project Phoenix', status: 'completed', progress: 100, createdAt: subDays(new Date(), 9), steps: [] },
-                { id: 'task-11', goal: 'Rotate SSL certificates on all public-facing services', status: 'completed', progress: 100, createdAt: subDays(new Date(), 12), steps: [] },
-                { id: 'task-12', goal: 'Test disaster recovery plan', status: 'completed', progress: 100, createdAt: subDays(new Date(), 15), steps: [] },
-                { id: 'task-13', goal: 'Decommission old web-server-03', status: 'completed', progress: 100, createdAt: subDays(new Date(), 21), steps: [] },
-                { id: 'task-14', goal: 'Update dependencies for the user-service monolith', status: 'failed', progress: 30, createdAt: subDays(new Date(), 25), steps: [] },
-                { id: 'task-15', goal: 'Run monthly cost-analysis report', status: 'completed', progress: 100, createdAt: subDays(new Date(), 29), steps: [] }
-            ])
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
         []
     );
