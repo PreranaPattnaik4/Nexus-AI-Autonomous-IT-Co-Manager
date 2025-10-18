@@ -87,5 +87,5 @@ To make the codebase easy to navigate for judges, the key files are organized in
     *   `tts.ts`: The Text-to-Speech flow that converts AI responses into spoken audio.
 
 ---
-*   `PROJECT_REPORT.md`: A detailed report covering the project's architecture, features, and implementation journey.
+*   [`PROJECT_REPORT.md`](../PROJECT_REPORT.md): A detailed report covering the project's architecture, features, and implementation journey.
 *   `firestore.rules`: Defines the security rules for the Firestore database.
