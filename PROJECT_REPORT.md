@@ -1,6 +1,8 @@
 # Nexus AI – Autonomous IT Co-Manager
 ## SuperHack 2025 Project Report
 
+**Live Demo Link:** [https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard](https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard)
+
 ---
 
 ### 1️⃣ Our Proposed Solution: The Future of Agentic AI for IT Management
