@@ -78,8 +78,8 @@ export default function FaqPage() {
                 <HelpCircle className="h-5 w-5" />
                 <CardTitle>Frequently Asked Questions</CardTitle>
                 </div>
-                <CardDescription>
-                 <p className="font-bold text-destructive">Important: Nexus AI is an assistive tool. Always verify outputs and consult human experts before making professional, financial or safety-critical decisions.</p>
+                <CardDescription className="!font-bold !text-destructive">
+                    Important: Nexus AI is an assistive tool. Always verify outputs and consult human experts before making professional, financial or safety-critical decisions.
                 </CardDescription>
             </CardHeader>
             <CardContent>
