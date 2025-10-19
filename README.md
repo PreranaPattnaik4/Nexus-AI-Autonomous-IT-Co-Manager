@@ -2,6 +2,8 @@
 
 **Live Demo:** [https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard](https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard)
 
+**Project Report:** [PROJECT_REPORT.md](PROJECT_REPORT.md) - A detailed report covering the project's architecture, features, and implementation journey.
+
 Nexus is a proactive Agentic AI solution for IT management that redefines IT operations by moving beyond simple automation to create a truly autonomous, intelligent partner. Unlike traditional IT automation tools that only follow predefined rules, Nexus can understand high-level goals and independently plan, execute, and adapt its actions to achieve them. It acts as an intelligent "project manager" for your IT infrastructure, handling everything from routine tasks to complex, multi-step problem-solving.
 
 This project was built for the SuperHack 2025 (Google Cloud + Firebase AI Challenge).
