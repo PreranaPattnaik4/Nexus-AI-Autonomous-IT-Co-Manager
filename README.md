@@ -85,7 +85,7 @@ To make the codebase easy to navigate for judges, the key files are organized in
     *   `task-execution-simulation.ts`: The "Executor Agent" that simulates running each task step.
     *   `rca-report-generation.ts`: The "Reporter Agent" that generates Root Cause Analysis reports.
     *   `proactive-issue-resolution.ts`: The agent that analyzes alerts and proposes solutions.
-    *   `conversational-rca.ts`: The AI logic for the System Health Assistant, including the tools it can use to query data.
+    *   `conversational-rca.ts`: the AI logic for the System Health Assistant, including the tools it can use to query data.
     *   `command-simulation.ts`: Powers the AI-driven command console.
     *   `tts.ts`: The Text-to-Speech flow that converts AI responses into spoken audio.
 *   `src/lib/firebase/admin.ts`: Initializes the Firebase Admin SDK for server-side access to Firestore.
