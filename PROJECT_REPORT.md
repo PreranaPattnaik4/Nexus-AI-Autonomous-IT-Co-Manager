@@ -23,25 +23,61 @@ These features work together to create an intelligent system that transforms the
 
 ### 3️⃣ Technical Architecture
 
-Nexus AI is built on a modern, serverless, and AI-native stack, designed for performance, real-time responsiveness, and intelligent automation. Each component was chosen to create a tightly integrated and efficient system.
+Nexus AI is built on a modern, serverless, and AI-native stack, designed for performance, real-time responsiveness, and intelligent automation. The architecture is centered around a Next.js application that contains both the user-facing UI and the server-side logic, creating a tightly integrated and efficient system.
 
-*   **Frontend**: The user interface is a **Next.js 15** application leveraging the **App Router** paradigm. This allows us to use **React Server Components (RSC)** by default, minimizing the amount of JavaScript sent to the client and improving initial load times. **TypeScript** is used for end-to-end type safety, and **ShadCN UI** provides a library of accessible, composable, and beautifully designed components built on top of **Tailwind CSS**, which handles all utility-class-based styling.
+#### Architecture Diagram
 
-*   **Backend**: We adopted a "serverless-first" approach by using **Next.js Server Actions** for all backend logic. This eliminates the need for a separate backend server or API endpoints, allowing us to co-locate our backend functions directly with the components that use them. This simplifies the architecture, improves performance by reducing network latency, and streamlines development.
+```mermaid
+graph TD
+    subgraph "Browser"
+        A[Next.js Client-Side UI <br/>(React, ShadCN, Tailwind)]
+    end
 
-*   **AI Layer**: All generative AI capabilities are orchestrated through **Genkit**, an open-source framework from Google. Genkit manages the entire lifecycle of our AI flows, from defining prompts to calling models and handling outputs. We use **Google's Gemini Pro API** for all reasoning tasks, including goal decomposition, root cause analysis, and conversational intelligence. The application's voice capabilities are powered by the **Gemini TTS (Text-to-Speech)** model.
+    subgraph "Server-Side (within Next.js)"
+        B[Next.js Server Actions <br/>(src/lib/actions.ts)]
+        C[Genkit AI Flows <br/>(Planner, Executor, Reporter Agents)]
+        D[Firebase Admin SDK]
+    end
+    
+    subgraph "Google Cloud"
+        E[Gemini Pro & TTS Models]
+        F[Firestore Database <br/>(Tasks, Reports, Alerts)]
+        G[Firebase Authentication]
+    end
 
-*   **Database & Authentication**: **Firebase** serves as the core of our data and user management layer. **Firestore** is used as a real-time, NoSQL database to store tasks, reports, alerts, and system data, allowing the UI to update live as agent actions are simulated. **Firebase Authentication** provides a secure and easy-to-implement solution for user sign-in and management, supporting standard email/password methods.
+    A -- "User Goal" --> B
+    B -- "Analyzes Goal" --> C
+    C -- "Reasons & Plans" --> E
+    E -- "Generates Steps/Reports" --> C
+    C -- "Saves Data" --> D
+    D -- "Writes/Reads" --> F
+    D -- "Manages Users" --> G
+    F -- "Real-time Updates" --> A
+    A -- "Displays Data" --> A
+```
 
-**Core Agentic Flow**:
-`Goal Input` → `Planner Agent (Gemini)` → `Subtasks (Firestore)` → `Executor Agent (Simulation)` → `Log Analysis` → `Reporter Agent (RCA)` → `Insights Generation`
+#### Frontend Tech Stack
 
-**Firestore Collections**:
-*   `/tasks/{taskId}`: Stores goals, progress, and nested steps.
-*   `/reports/{reportId}`: Contains AI-generated RCA reports.
-*   `/alerts/{alertId}`: Holds active and resolved system alerts.
-*   `/systems/{systemId}`: Stores mock data for system health metrics.
-*   `/users/{userId}`: Manages user profile information.
+The user interface is a **Next.js 15** application designed for a rich, responsive, and real-time experience.
+
+*   **Framework (Next.js 15 & React 18)**: We leverage the **App Router** paradigm, which enables **React Server Components (RSC)** by default. This minimizes the client-side JavaScript bundle size, leading to faster initial page loads and better performance.
+*   **Language (TypeScript)**: The entire frontend is written in TypeScript, providing end-to-end type safety that catches errors during development and improves code quality and maintainability.
+*   **UI Components (ShadCN UI)**: We use a comprehensive library of accessible, composable, and beautifully designed components from ShadCN UI. This allows for rapid development of a professional and consistent user interface without being locked into a specific design system.
+*   **Styling (Tailwind CSS)**: All styling is handled with Tailwind CSS, a utility-first framework that enables us to build custom designs directly in our markup. The theme is configured via CSS variables in `globals.css` for easy customization of the dark and light modes.
+*   **Data Visualization (Recharts)**: Dynamic charts for system metrics (CPU, Memory, Network) on the dashboard are built using Recharts, a composable charting library for React.
+
+#### Backend Tech Stack
+
+The backend is built on a "serverless-first" philosophy, co-locating logic with the frontend framework for simplicity and performance.
+
+*   **Backend Logic (Next.js Server Actions)**: Instead of a traditional REST or GraphQL API, all backend logic is encapsulated within Next.js Server Actions located in `src/lib/actions.ts`. This simplifies the architecture by eliminating the need for separate API endpoints, reduces network latency, and maintains full type safety between the client and server.
+*   **AI Orchestration (Genkit)**: All generative AI capabilities are orchestrated through **Genkit**, an open-source framework from Google. Genkit manages the entire lifecycle of our AI flows—from defining prompts and structuring outputs with Zod schemas to calling the appropriate models. This keeps our AI logic organized, maintainable, and decoupled from the core application logic.
+*   **AI Models (Google Gemini Pro & TTS)**:
+    *   **Gemini Pro**: Powers all reasoning tasks, including goal decomposition (Planner Agent), root cause analysis (Reporter Agent), and conversational intelligence (Health Assistant).
+    *   **Gemini TTS**: The Text-to-Speech model is used to convert the AI assistant's text responses into natural-sounding speech, creating a more interactive and accessible user experience.
+*   **Database & Auth (Firebase)**:
+    *   **Firestore**: Acts as the real-time, NoSQL database for the application. It stores all critical data, including tasks, RCA reports, system alerts, and user information. Its real-time capabilities are essential for the dashboard, which updates live as the "Executor Agent" simulates task progress.
+    *   **Firebase Authentication**: Provides a secure and easy-to-implement solution for user sign-in and management, supporting standard email/password methods. The server-side logic is handled by the **Firebase Admin SDK**.
 
 ### 4️⃣ Implemented Features (Milestones 1–10)
 
