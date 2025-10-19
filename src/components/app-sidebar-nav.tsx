@@ -82,7 +82,7 @@ export function AppSidebarNav() {
             isActive = true;
         }
         
-        if (item.href..includes('status=failed') && currentPath.includes('tab=failed')) {
+        if (item.href.includes('status=failed') && currentPath.includes('tab=failed')) {
             isActive = true;
         }
 
