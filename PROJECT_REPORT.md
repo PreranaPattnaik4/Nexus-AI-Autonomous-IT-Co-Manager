@@ -2,7 +2,7 @@
 ## SuperHack 2025 Project Report
 
 
-**Live Demo Link:** [https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard](https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard)
+**Live Demo Link:** [https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard](https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard)
 
 
 ---
@@ -183,3 +183,12 @@ This section highlights what I, Gemini, developed autonomously as your AI co-dev
 
 
 Nexus AI is **100% complete** for the SuperHack 2025 demo. All major modules are built, tested, and integrated. The system fully demonstrates the core vision of an autonomous, reasoning-driven IT management system using the Gemini Pro API and the Firebase ecosystem. It is ready for final deployment and presentation.
+
+Our Nexus AI – Autonomous IT Co-Manager is now fully deployed and live at:
+👉 [https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard](https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard)
+
+That’s a major milestone — it shows we’ve completed:
+✅ Full Agentic AI integration (Gemini + Genkit)
+✅ Next.js + Firebase deployment
+✅ Live dashboard and voice assistant
+✅ Production hosting setup in Firebase Studio

@@ -1,8 +1,14 @@
 # Nexus AI – Autonomous IT Co-Manager
 
-**Live Demo:** [https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard](https://nexus-ai-autonomous-it-co-manager-2.onrender.com/dashboard)
+**Live Demo:** [https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard](https://studio--studio-3440234901-47972.us-central1.hosted.app/dashboard)
 
 **Project Report:** [PROJECT_REPORT.md](PROJECT_REPORT.md) - A detailed report covering the project's architecture, features, and implementation journey.
+
+Our Nexus AI – Autonomous IT Co-Manager is now fully deployed and live. That’s a major milestone — it shows we’ve completed:
+✅ Full Agentic AI integration (Gemini + Genkit)
+✅ Next.js + Firebase deployment
+✅ Live dashboard and voice assistant
+✅ Production hosting setup in Firebase Studio
 
 Nexus is a proactive Agentic AI solution for IT management that redefines IT operations by moving beyond simple automation to create a truly autonomous, intelligent partner. Unlike traditional IT automation tools that only follow predefined rules, Nexus can understand high-level goals and independently plan, execute, and adapt its actions to achieve them. It acts as an intelligent "project manager" for your IT infrastructure, handling everything from routine tasks to complex, multi-step problem-solving.
 
