@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { nanoid } from 'nanoid';
 import { Bot, CornerDownLeft, Loader, Mic, MicOff, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { marked } from 'marked';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { askHealthAssistantAction, generateSpeechAction } from '@/lib/actions';
 
 
 function SubmitButton({ pending }: { pending: boolean }) {
@@ -63,7 +64,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const recognitionRef = useRef<any>(null);
@@ -135,35 +136,53 @@ export default function ChatPage() {
   }, [messages]);
 
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const messageContent = inputValue;
-    if(!messageContent.trim()) return;
+    const messageContent = inputValue.trim();
+    if (!messageContent) return;
 
-    const userMessage: ChatMessage = {
+    const newMessages: ChatMessage[] = [
+      ...messages,
+      {
         id: nanoid(),
         role: 'user',
         content: messageContent,
         createdAt: new Date(),
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setIsPending(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-        const aiMessage: ChatMessage = {
-            id: nanoid(),
-            role: 'model',
-            content: `This is a static response for: "${messageContent}". In a real application, this would be a dynamic answer from the AI. For example, there are **3** tasks currently in progress.`,
-            createdAt: new Date(),
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setIsPending(false);
-    }, 1500);
-
-    setInputValue(''); 
+      },
+    ];
+    setMessages(newMessages);
+    setInputValue('');
     inputRef.current?.focus();
-  }
+
+    startTransition(async () => {
+      const result = await askHealthAssistantAction(newMessages);
+      if (result.success && result.response) {
+        const aiMessage: ChatMessage = {
+          id: nanoid(),
+          role: 'model',
+          content: result.response,
+          createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+        
+        // Generate and play audio
+        const audioResult = await generateSpeechAction(result.response);
+        if (audioResult.success && audioResult.media) {
+            const audio = new Audio(audioResult.media);
+            audio.play();
+        }
+
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error || 'The assistant failed to respond.',
+        });
+        // Remove the user's message if the API call fails
+        setMessages(messages);
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-14rem)]">

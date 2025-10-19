@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
@@ -13,6 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { RcaReportDialog } from './rca-report-dialog';
 import type { Task } from '@/lib/firestore-types';
 import { useToast } from '@/hooks/use-toast';
+import { retryTaskAction } from '@/lib/actions';
 
 const statusIcons = {
   'in-progress': <Loader className="h-4 w-4 animate-spin text-blue-500" />,
@@ -35,17 +35,25 @@ function StepLog({ log }: { log: string }) {
     );
 }
 
-function RetryButton({ taskId, taskGoal }: { taskId: string, taskGoal: string }) {
+function RetryButton({ task }: { task: Task }) {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
 
     const handleRetry = () => {
-        startTransition(() => {
-            // Mock function
-            toast({
-                title: 'AI Self-Healing Initiated (Mock)',
-                description: `AI is analyzing the failure for task '${taskId}' and creating a new plan.`,
-            });
+        startTransition(async () => {
+            const result = await retryTaskAction(task);
+            if(result.success) {
+                toast({
+                    title: 'AI Self-Healing Initiated',
+                    description: `AI is analyzing the failure for task '${task.id}' and creating a new plan.`,
+                });
+            } else {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: result.error || 'Failed to retry task.',
+                });
+            }
         });
     };
 
@@ -109,7 +117,7 @@ export function TaskItem({ task }: { task: Task }) {
             </CollapsibleTrigger>
             {isFinished && task.id && <RcaReportDialog taskId={task.id} />}
           </div>
-          {task.status === 'failed' && <RetryButton taskId={task.id} taskGoal={task.goal} />}
+          {task.status === 'failed' && <RetryButton task={task} />}
         </div>
       </div>
       <CollapsibleContent className="mt-4 space-y-3 pl-4">

@@ -12,6 +12,7 @@ import { Alert } from '@/lib/firestore-types';
 import { Skeleton } from '../ui/skeleton';
 import { ScrollArea } from '../ui/scroll-area';
 import { initialAlerts } from '@/lib/data';
+import { resolveAlertAction } from '@/lib/actions';
 
 
 const severityIcons = {
@@ -20,18 +21,26 @@ const severityIcons = {
   low: <Info className="h-5 w-5 text-blue-500" />,
 };
 
-function ResolveButton({ alertTitle }: { alertTitle: string }) {
+function ResolveButton({ alert }: { alert: Omit<Alert, 'id' | 'timestamp'> }) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const handleClick = () => {
-    startTransition(() => {
-      // This is a mock function now.
-      toast({
-        title: 'Action Initiated (Mock)',
-        description: `Creating a new task to resolve: ${alertTitle}`,
-        action: <CheckCircle className="h-5 w-5 text-green-500" />,
-      });
+    startTransition(async () => {
+      const result = await resolveAlertAction(alert);
+      if (result.success) {
+        toast({
+            title: 'Action Initiated',
+            description: `Creating a new task to resolve: ${alert.title}`,
+            action: <CheckCircle className="h-5 w-5 text-green-500" />,
+        });
+      } else {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: result.error || `Failed to create task for alert: ${alert.title}`,
+        });
+      }
     });
   };
 
@@ -97,7 +106,7 @@ export function AlertsCard() {
                         </p>
                       </div>
                     </div>
-                    <ResolveButton alertTitle={alert.title} />
+                    <ResolveButton alert={{ title: alert.title, description: alert.description, severity: alert.severity }} />
                   </div>
                 ))
               ) : (

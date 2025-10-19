@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { ArrowRight, ChevronRight, Loader, Terminal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import type { CommandSimulationResult } from '@/lib/firestore-types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { nanoid } from 'nanoid';
+import { simulateCommandAction } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 
 function SubmitButton({ pending }: { pending: boolean }) {
   return (
@@ -41,7 +42,8 @@ export default function ConsolePage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [history, setHistory] = useState<CommandSimulationResult[]>([]);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -58,8 +60,6 @@ export default function ConsolePage() {
     const command = formData.get('command') as string;
     if(!command.trim()) return;
     
-    setIsPending(true);
-
     const commandEntry: CommandSimulationResult = {
       id: nanoid(),
       command,
@@ -69,16 +69,25 @@ export default function ConsolePage() {
 
     setHistory(prev => [...prev, commandEntry]);
     
-    setTimeout(() => {
-      const simulatedOutput = `> Simulating output for: ${command}\n> This is a static response. In a real application, the AI would generate a realistic output.\n> For example, for 'ls -la', it might show file listings.`;
+    startTransition(async () => {
+        const result = await simulateCommandAction(command);
 
-      setHistory(prev => prev.map(h => 
-        h.id === commandEntry.id ? { ...h, output: simulatedOutput } : h
-      ));
-      setIsPending(false);
-      formRef.current?.reset();
-      inputRef.current?.focus();
-    }, 1000);
+        if (result.success && result.output) {
+            setHistory(prev => prev.map(h => 
+                h.id === commandEntry.id ? { ...h, output: result.output! } : h
+            ));
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: result.error || 'Failed to simulate command.',
+            });
+            setHistory(prev => prev.filter(h => h.id !== commandEntry.id));
+        }
+
+        formRef.current?.reset();
+        inputRef.current?.focus();
+    });
   };
 
   return (
@@ -89,7 +98,7 @@ export default function ConsolePage() {
           <CardTitle>Demo Command Console</CardTitle>
         </div>
         <CardDescription className='font-sans'>
-          Interact with a simulated AI assistant. Enter a command and see the static output.
+          Interact with a simulated AI assistant. Enter a command and see the AI-generated output.
         </CardDescription>
       </CardHeader>
       

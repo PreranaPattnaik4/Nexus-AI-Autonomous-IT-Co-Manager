@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { useRef, useTransition } from 'react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { createTaskAction } from '@/lib/actions';
+import { useForm, zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form';
 
 function SubmitButton({ pending }: { pending: boolean }) {
   return (
@@ -19,37 +22,40 @@ function SubmitButton({ pending }: { pending: boolean }) {
   );
 }
 
+const GoalFormSchema = z.object({
+  goal: z.string().min(10, 'Goal must be at least 10 characters long.'),
+});
+
 export function GoalForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  
+  const form = useForm<z.infer<typeof GoalFormSchema>>({
+    resolver: zodResolver(GoalFormSchema),
+    defaultValues: {
+      goal: '',
+    },
+  });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const goal = formData.get('goal') as string;
-
-    if (!goal || goal.trim().length < 10) {
-      setError('Goal must be at least 10 characters long.');
-      return;
-    }
-    setError(null);
-    setPending(true);
-
-    // Simulate backend call
-    setTimeout(() => {
-      toast({
-        title: 'Success (Mock)',
-        description: 'Successfully created task. Agent is starting execution...',
-      });
-      formRef.current?.reset();
-      setPending(false);
-      // In a real app, you might want to add the task to a local state
-      // For this demo, we'll just refresh to show it's a static view
-      router.refresh(); 
-    }, 1500);
+  const onSubmit = (values: z.infer<typeof GoalFormSchema>) => {
+    startTransition(async () => {
+      const result = await createTaskAction(values.goal);
+      if (result.success) {
+        toast({
+          title: 'Success',
+          description: 'Successfully created task. Agent is starting execution...',
+          action: <CheckCircle className="h-5 w-5 text-green-500" />,
+        });
+        form.reset();
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error || 'An unexpected error occurred.',
+        });
+      }
+    });
   };
 
   return (
@@ -61,27 +67,36 @@ export function GoalForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="goal">Your Goal</Label>
-            <Textarea
-              id="goal"
+        <Form {...form}>
+          <form
+            ref={formRef}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
               name="goal"
-              placeholder="e.g., 'Ensure all production servers are patched' or 'Onboard new developer to the project-x repository'"
-              rows={4}
-              required
-              className="font-code"
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="goal">Your Goal</Label>
+                  <FormControl>
+                    <Textarea
+                      id="goal"
+                      placeholder="e.g., 'Ensure all production servers are patched' or 'Onboard new developer to the project-x repository'"
+                      rows={4}
+                      className="font-mono"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {error && (
-              <p className="text-sm font-medium text-destructive">
-                {error}
-              </p>
-            )}
-          </div>
-          <div className="flex justify-start">
-            <SubmitButton pending={pending} />
-          </div>
-        </form>
+            <div className="flex justify-start">
+              <SubmitButton pending={isPending} />
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { nanoid } from 'nanoid';
 import { Bot, CornerDownLeft, Loader, MessageCircle, Mic, MicOff, User } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
@@ -14,6 +13,7 @@ import { marked } from 'marked';
 import { ScrollArea } from './ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from './icons';
+import { askHealthAssistantAction, generateSpeechAction } from '@/lib/actions';
 
 
 function SubmitButton({ pending }: { pending: boolean }) {
@@ -65,7 +65,7 @@ export function ChatDialog() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const recognitionRef = useRef<any>(null);
@@ -140,33 +140,51 @@ export function ChatDialog() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const messageContent = inputValue;
-    if(!messageContent.trim()) return;
+    const messageContent = inputValue.trim();
+    if (!messageContent) return;
 
-    const userMessage: ChatMessage = {
+    const newMessages: ChatMessage[] = [
+      ...messages,
+      {
         id: nanoid(),
         role: 'user',
         content: messageContent,
         createdAt: new Date(),
-    };
-    setMessages(prev => [...prev, userMessage]);
-    setIsPending(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-        const aiMessage: ChatMessage = {
-            id: nanoid(),
-            role: 'model',
-            content: `This is a static response for: "${messageContent}". In a real application, this would be a dynamic answer from the AI. For example, the root cause for the DB server issue was a corrupted index.`,
-            createdAt: new Date(),
-        };
-        setMessages(prev => [...prev, aiMessage]);
-        setIsPending(false);
-    }, 1500);
-
-    setInputValue(''); 
+      },
+    ];
+    setMessages(newMessages);
+    setInputValue('');
     inputRef.current?.focus();
-  }
+
+    startTransition(async () => {
+      const result = await askHealthAssistantAction(newMessages);
+      if (result.success && result.response) {
+        const aiMessage: ChatMessage = {
+          id: nanoid(),
+          role: 'model',
+          content: result.response,
+          createdAt: new Date(),
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+
+        // Generate and play audio
+        const audioResult = await generateSpeechAction(result.response);
+        if (audioResult.success && audioResult.media) {
+            const audio = new Audio(audioResult.media);
+            audio.play();
+        }
+
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error || 'The assistant failed to respond.',
+        });
+        // Remove the user's message if the API call fails
+        setMessages(messages);
+      }
+    });
+  };
   
   return (
     <Dialog>
